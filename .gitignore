@@ -16,11 +16,11 @@ cmake_install.cmake
 Makefile
 
 # Ignore tutorial files
-1_hellow_window/
+1_hello_window/
 2_shaders/
 3_textures/
 4_transformations/
-5_coodrdinate_systems/
+5_coordinate_systems/
 6_camera/
 7_lighting/
 awesomeface.png
