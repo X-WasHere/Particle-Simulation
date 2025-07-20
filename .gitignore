@@ -1,0 +1,28 @@
+# Ignore VScode preference and cache files
+.vs/
+
+# Ignore build files
+build/
+*.exe
+*.obj
+*.o
+*.log
+*.vcxproj
+*.vcxproj.filters
+*.sln
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# Ignore tutorial files
+1_hellow_window/
+2_shaders/
+3_textures/
+4_transformations/
+5_coodrdinate_systems/
+6_camera/
+7_lighting/
+awesomeface.png
+boxart.jpg
+container.jpg
