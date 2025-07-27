@@ -62,13 +62,14 @@ int main() {
 
 
 	// Particle properties
-	std::vector<float> position = { 0.0f, 0.0f , 0.0f};
+	std::vector<float> position = {-0.9f, 0.0f , 0.0f };
+	std::vector<float> velocity = { 0.0f, 0.0f , 0.0f };
 	float radius = 50.0f;
 	int numSides = 50;
 	float dampingFactor = 0.85f;
 
 	// Particle object
-	Particle particle(position, radius, numSides, ourShader, SCREEN_WIDTH, SCREEN_HEIGHT);
+	Particle particle(position, velocity, radius, numSides, ourShader, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	// RENDERING LOOP
 	while (!glfwWindowShouldClose(window)) {
