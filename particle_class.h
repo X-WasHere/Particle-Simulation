@@ -11,7 +11,7 @@ class Particle
 public:
 	std::vector<float> position;
 	std::vector<float> vertices;
-	std::vector<float> velocity = { 0.0f, 0.0f, 0.0f };
+	std::vector<float> velocity;
 	unsigned int numSides;
 	int numVertices;
 	float radius;
@@ -22,8 +22,8 @@ public:
 	unsigned int SCR_HEIGHT;
 
 	// Constructor sets up circle vertices vector with initial xyz position
-	Particle(std::vector<float> position_, float radius_, int numSides_, Shader& ourShader_, const unsigned int SCREEN_WIDTH, const unsigned SCREEN_HEIGHT) 
-		: position(position_), radius(radius_), numSides(numSides_), ourShader(ourShader_), SCR_WIDTH(SCREEN_WIDTH), SCR_HEIGHT(SCREEN_HEIGHT)
+	Particle(std::vector<float> position_, std::vector<float> velocity_, float radius_, int numSides_, Shader& ourShader_, const unsigned int SCREEN_WIDTH, const unsigned SCREEN_HEIGHT) 
+		: position(position_), velocity(velocity_), radius(radius_), numSides(numSides_), ourShader(ourShader_), SCR_WIDTH(SCREEN_WIDTH), SCR_HEIGHT(SCREEN_HEIGHT)
 	{
 		numVertices = numSides + 2;
 
@@ -71,14 +71,32 @@ public:
 
 	void add_border_collision(float dampingFactor)
 	{
+		// vertical collision
 		if (position[1] - (radius / SCR_HEIGHT) <= -1.0) // check bottom of screen 
 		{
 			position[1] = -1.0 + (radius / SCR_HEIGHT); // prevent bounce from below floor
 			velocity[1] *= -1.0 * dampingFactor;
 
-			if (std::abs(velocity[1]) < 0.1f) {
+			if (std::abs(velocity[1]) < 0.1f) { // prevent "infinite" bounce due to gravity
 				velocity[1] = 0.0f;
 			}
+		}
+		if (position[1] + (radius / SCR_HEIGHT) >= 1.0) // check top of screen 
+		{
+			position[1] = 1.0 - (radius / SCR_HEIGHT); // prevent bounce from above ceiling
+			velocity[1] *= -1.0 * dampingFactor;
+		}
+
+		// horizontal collision
+		if (position[0] - (radius / SCR_WIDTH) <= -1.0) // check left side of screen 
+		{
+			position[0] = -1.0 + (radius / SCR_WIDTH); 
+			velocity[0] *= -1.0 * dampingFactor;
+		}
+		if (position[0] + (radius / SCR_WIDTH) >= 1.0) // check right side of screen 
+		{
+			position[0] = 1.0 - (radius / SCR_WIDTH);
+			velocity[0] *= -1.0 * dampingFactor;
 		}
 	}
 };
