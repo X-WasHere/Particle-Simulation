@@ -72,10 +72,10 @@ public:
 	void add_border_collision(float dampingFactor)
 	{
 		// vertical collision
-		if (position[1] - (radius / SCR_HEIGHT) <= -1.0) // check bottom of screen 
+		if (position[1] - (radius / SCR_HEIGHT) <= -1.0f) // check bottom of screen 
 		{
-			position[1] = -1.0 + (radius / SCR_HEIGHT); // prevent bounce from below floor
-			velocity[1] *= -1.0 * dampingFactor;
+			position[1] = -1.0f + (radius / SCR_HEIGHT); // prevent bounce from below floor
+			velocity[1] *= -1.0f * dampingFactor;
 
 			if (std::abs(velocity[1]) < 0.1f) { // prevent "infinite" bounce due to gravity
 				velocity[1] = 0.0f;
@@ -83,20 +83,20 @@ public:
 		}
 		if (position[1] + (radius / SCR_HEIGHT) >= 1.0) // check top of screen 
 		{
-			position[1] = 1.0 - (radius / SCR_HEIGHT); // prevent bounce from above ceiling
-			velocity[1] *= -1.0 * dampingFactor;
+			position[1] = 1.0f - (radius / SCR_HEIGHT); // prevent bounce from above ceiling
+			velocity[1] *= -1.0f * dampingFactor;
 		}
 
 		// horizontal collision
-		if (position[0] - (radius / SCR_WIDTH) <= -1.0) // check left side of screen 
+		if (position[0] - (radius / SCR_WIDTH) <= -1.0f) // check left side of screen 
 		{
-			position[0] = -1.0 + (radius / SCR_WIDTH); 
-			velocity[0] *= -1.0 * dampingFactor;
+			position[0] = -1.0f + (radius / SCR_WIDTH); 
+			velocity[0] *= -1.0f * dampingFactor;
 		}
-		if (position[0] + (radius / SCR_WIDTH) >= 1.0) // check right side of screen 
+		if (position[0] + (radius / SCR_WIDTH) >= 1.0f) // check right side of screen 
 		{
-			position[0] = 1.0 - (radius / SCR_WIDTH);
-			velocity[0] *= -1.0 * dampingFactor;
+			position[0] = 1.0f - (radius / SCR_WIDTH);
+			velocity[0] *= -1.0f * dampingFactor;
 		}
 	}
 };
