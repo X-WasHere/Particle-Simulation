@@ -1,0 +1,127 @@
+#include "particle.h"
+
+// ------------------ class Particle ------------------
+// Constructor sets up circle vertices vector with initial xyz position
+Particle::Particle(std::vector<float> position_, std::vector<float> velocity_, float radius_, int numSides_, const unsigned int SCREEN_WIDTH, const unsigned SCREEN_HEIGHT)
+	: position(position_), velocity(velocity_), radius(radius_), numSides(numSides_), SCR_WIDTH(SCREEN_WIDTH), SCR_HEIGHT(SCREEN_HEIGHT)
+{
+	numVertices = numSides + 2;
+
+	// Setup verticies vector
+	vertices.push_back(position[0]); // x
+	vertices.push_back(position[1]); // y
+	vertices.push_back(position[2]); // z
+}
+
+// Member functions 
+void Particle::drawCircle(unsigned int& VAO, unsigned int& VBO, Shader& ourShader)
+{
+	float doublePi = 2.0f * 3.141592653f;
+	vertices.clear();
+	// Trigonometry to calculate vertices (rememeber 0,0 is centre) 
+	for (int i = 1; i < numVertices; i++) {
+		vertices.push_back(position[0] + (radius * cos(i * doublePi / numSides)) / SCR_WIDTH); // remember that screen dimensions are normalised
+		vertices.push_back(position[1] + (radius * sin(i * doublePi / numSides)) / SCR_HEIGHT); // verticies must be {-1, 1}
+		vertices.push_back(position[2]);
+	}
+
+	glBindVertexArray(VAO);
+
+	// Bind VBO buffer
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW); // copy vertex data into buffer
+
+	// Set vertex attribute pointers 
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	glEnableVertexAttribArray(0);
+
+	// Draw objects 
+	ourShader.use(); // activate shader
+	glDrawArrays(GL_TRIANGLE_FAN, 0, numVertices);
+	glBindVertexArray(0);
+}
+
+void Particle::add_velocity(float deltaTime)
+{
+	// Update position
+	position[0] += velocity[0] * deltaTime;
+	position[1] += velocity[1] * deltaTime;
+	velocity[1] += (-9.81f) * deltaTime;
+}
+
+void Particle::add_border_collision(float dampingFactor)
+{
+	// vertical collision
+	if (position[1] - (radius / SCR_HEIGHT) <= -1.0f) // check bottom of screen 
+	{
+		position[1] = -1.0f + (radius / SCR_HEIGHT); // prevent bounce from below floor
+		velocity[1] *= -1.0f * dampingFactor;
+
+		if (std::abs(velocity[1]) < 0.2f) { // prevent "infinite" bounce due to gravity
+			velocity[1] = 0.0f;
+		}
+	}
+	if (position[1] + (radius / SCR_HEIGHT) >= 1.0) // check top of screen 
+	{
+		position[1] = 1.0f - (radius / SCR_HEIGHT); // prevent bounce from above ceiling
+		velocity[1] *= -1.0f * dampingFactor;
+	}
+
+	// horizontal collision
+	if (position[0] - (radius / SCR_WIDTH) <= -1.0f) // check left side of screen 
+	{
+		position[0] = -1.0f + (radius / SCR_WIDTH);
+		velocity[0] *= -1.0f * dampingFactor;
+	}
+	if (position[0] + (radius / SCR_WIDTH) >= 1.0f) // check right side of screen 
+	{
+		position[0] = 1.0f - (radius / SCR_WIDTH);
+		velocity[0] *= -1.0f * dampingFactor;
+	}
+}
+
+
+// ------------------ class ParticleSystem ------------------
+ParticleSystem::ParticleSystem(unsigned int SCREEN_WIDTH, unsigned int SCREEN_HEIGHT, Shader& ourShader, unsigned int& VAO, unsigned int& VBO,
+	float particleRadius, int numSides, float dampingFactor, int numParticles): 
+	SCR_WIDTH(SCREEN_WIDTH), SCR_HEIGHT(SCREEN_HEIGHT), ourShader(ourShader), VAO(VAO), VBO(VBO), particleRadius(particleRadius), numSides(numSides), 
+	dampingFactor(dampingFactor), numParticles(numParticles)
+{
+	std::vector<float> position = { 0.0f, 0.0f , 0.0f };
+	std::vector<float> velocity = { 0.0f, 0.0f , 0.0f };
+
+	for (int i = 0; i < numParticles; i++) {
+		position[0] = utils::randFloat(1);
+		position[1] = utils::randFloat(1);
+		velocity[0] = utils::randFloat(5);
+		velocities.push_back(velocity);
+		positions.push_back(position);
+		for (int i = 0; i <= 2; i++) {
+			std::cout << position[i] << ",";
+		}
+		std::cout << "" << std::endl;
+	}
+}
+
+std::vector<Particle> ParticleSystem::createParticles()
+{
+	std::vector<Particle> particles;
+	for (int i = 0; i < positions.size(); i++) {
+		Particle particle(positions[i], velocities[i], particleRadius, numSides, SCR_WIDTH, SCR_HEIGHT);
+		particles.push_back(particle);
+	}
+
+	return particles;
+}
+
+void ParticleSystem::drawSystem(std::vector<Particle>& particles, Shader& ourShader, float deltaTime) 
+{
+	for (Particle& particle : particles) {
+
+		setDeltaTime(deltaTime);
+		//std::cout << "Particle velocity : " << particle.velocity[0] << "," << particle.velocity[1] << std::endl;
+		particle.drawCircle(VAO, VBO, ourShader);
+		particle.add_velocity(deltaTime);
+		particle.add_border_collision(dampingFactor);
+	}
+}
