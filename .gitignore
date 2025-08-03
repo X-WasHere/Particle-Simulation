@@ -26,3 +26,7 @@ Makefile
 awesomeface.png
 boxart.jpg
 container.jpg
+
+# Ignore debug files
+x64/Debug
+opengl_g.b38dd121/x64/Debug

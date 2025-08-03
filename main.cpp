@@ -2,13 +2,14 @@
 #include <GLFW/glfw3.h>
 
 #include "shader_class.h"
-#include "particle_class.h"
+#include "particle.h"
 
 // standard C++ headers 
 #include <iostream>
 #include <cmath>
 #include <cstdlib>
 #include <vector>
+#include <random>
 
 // screen settings
 const unsigned int SCREEN_WIDTH = 800;
@@ -19,8 +20,6 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 // functions
-//void drawCircle(unsigned int& VBO, unsigned int& VAO, std::vector<float> position, 
-//	float radius, int numberOfSides, Shader& ourShader);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 
@@ -51,7 +50,7 @@ int main() {
 	// Setup viewport
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); /// tell GLFW to use callback on every window resize
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // lock mouse to window
+	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // lock mouse to window
 
 	// Shader object
 	Shader ourShader("shader.vs", "shader.fs");
@@ -61,15 +60,8 @@ int main() {
 	glGenBuffers(1, &VBO);      // "                 " vertex buffer object
 
 
-	// Particle properties
-	std::vector<float> position = {-0.9f, 0.0f , 0.0f };
-	std::vector<float> velocity = { 0.0f, 0.0f , 0.0f };
-	float radius = 50.0f;
-	int numSides = 50;
-	float dampingFactor = 0.85f;
-
-	// Particle object
-	Particle particle(position, velocity, radius, numSides, ourShader, SCREEN_WIDTH, SCREEN_HEIGHT);
+	ParticleSystem particleSystem(SCREEN_WIDTH, SCREEN_HEIGHT, ourShader, VAO, VBO);
+	std::vector<Particle> particles = particleSystem.createParticles(); // create array of particle objects
 
 	// RENDERING LOOP
 	while (!glfwWindowShouldClose(window)) {
@@ -85,9 +77,7 @@ int main() {
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 
-		particle.drawCircle(VAO, VBO);
-		particle.add_velocity(deltaTime);
-		particle.add_border_collision(dampingFactor);
+		particleSystem.drawSystem(particles, ourShader, deltaTime);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents(); // check for event triggering
@@ -97,10 +87,6 @@ int main() {
 	return 0;
 }
 
-void updatePosition(std::vector<float>position, std::vector<float>velocity, float deltaTime) 
-{
-
-}
 
 // Whenever window sized changes, callback function executes
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -109,7 +95,8 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 }
 
 // Input control
-void processInput(GLFWwindow* window) {
+void processInput(GLFWwindow* window) 
+{
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) 
 		glfwSetWindowShouldClose(window, true);
 }
