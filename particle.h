@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glad/glad.h>
+#include <glm/glm.hpp>
 #include <vector>
 
 #include "shader_class.h"
@@ -10,9 +11,10 @@ class Particle
 {
 //private:
 public:
-	std::vector<float> position;
+	glm::vec3 position;
+	glm::vec3 velocity;
 	std::vector<float> vertices;
-	std::vector<float> velocity;
+	//std::vector<float> velocity;
 	unsigned int numSides;
 	int numVertices;
 	float radius;
@@ -23,7 +25,7 @@ public:
 //public:
 
 	// Constructor sets up circle vertices vector with initial xyz position
-	Particle(std::vector<float> position_, std::vector<float> velocity_, float radius_, int numSides_, const unsigned int SCREEN_WIDTH, const unsigned SCREEN_HEIGHT);
+	Particle(glm::vec3 position_, glm::vec3 velocity_, float radius_, int numSides_, const unsigned int SCREEN_WIDTH, const unsigned SCREEN_HEIGHT);
 
 	// Member functions 
 	void drawCircle(unsigned int& VAO, unsigned int& VBO, Shader& ourShader);
@@ -41,8 +43,8 @@ private:
 	int numSides;
 	float dampingFactor;
 	// Create array of positions and velocities 
-	std::vector<std::vector<float>> positions;
-	std::vector<std::vector<float>> velocities;
+	std::vector<glm::vec3> positions;
+	std::vector<glm::vec3> velocities;
 
 	// Screen settings and rendering
 	unsigned int SCR_WIDTH;
