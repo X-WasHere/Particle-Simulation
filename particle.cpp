@@ -2,15 +2,15 @@
 
 // ------------------ class Particle ------------------
 // Constructor sets up circle vertices vector with initial xyz position
-Particle::Particle(std::vector<float> position_, std::vector<float> velocity_, float radius_, int numSides_, const unsigned int SCREEN_WIDTH, const unsigned SCREEN_HEIGHT)
+Particle::Particle(glm::vec3 position_, glm::vec3 velocity_, float radius_, int numSides_, const unsigned int SCREEN_WIDTH, const unsigned SCREEN_HEIGHT)
 	: position(position_), velocity(velocity_), radius(radius_), numSides(numSides_), SCR_WIDTH(SCREEN_WIDTH), SCR_HEIGHT(SCREEN_HEIGHT)
 {
 	numVertices = numSides + 2;
 
 	// Setup verticies vector
-	vertices.push_back(position[0]); // x
-	vertices.push_back(position[1]); // y
-	vertices.push_back(position[2]); // z
+	vertices.push_back(position.x); // x
+	vertices.push_back(position.y); // y
+	vertices.push_back(position.z); // z
 }
 
 // Member functions 
@@ -20,9 +20,9 @@ void Particle::drawCircle(unsigned int& VAO, unsigned int& VBO, Shader& ourShade
 	vertices.clear();
 	// Trigonometry to calculate vertices (rememeber 0,0 is centre) 
 	for (int i = 1; i < numVertices; i++) {
-		vertices.push_back(position[0] + (radius * cos(i * doublePi / numSides)) / SCR_WIDTH); // remember that screen dimensions are normalised
-		vertices.push_back(position[1] + (radius * sin(i * doublePi / numSides)) / SCR_HEIGHT); // verticies must be {-1, 1}
-		vertices.push_back(position[2]);
+		vertices.push_back(position.x + (radius * cos(i * doublePi / numSides)) / SCR_WIDTH); // remember that screen dimensions are normalised
+		vertices.push_back(position.y + (radius * sin(i * doublePi / numSides)) / SCR_HEIGHT); // verticies must be {-1, 1}
+		vertices.push_back(position.z);
 	}
 
 	glBindVertexArray(VAO);
@@ -44,39 +44,39 @@ void Particle::drawCircle(unsigned int& VAO, unsigned int& VBO, Shader& ourShade
 void Particle::add_velocity(float deltaTime)
 {
 	// Update position
-	position[0] += velocity[0] * deltaTime;
-	position[1] += velocity[1] * deltaTime;
-	velocity[1] += (-9.81f) * deltaTime;
+	position.x += velocity.x * deltaTime;
+	position.y += velocity.y * deltaTime;
+	velocity.y += (-9.81f) * deltaTime;
 }
 
 void Particle::add_border_collision(float dampingFactor)
 {
 	// vertical collision
-	if (position[1] - (radius / SCR_HEIGHT) <= -1.0f) // check bottom of screen 
+	if (position.y - (radius / SCR_HEIGHT) <= -1.0f) // check bottom of screen 
 	{
-		position[1] = -1.0f + (radius / SCR_HEIGHT); // prevent bounce from below floor
-		velocity[1] *= -1.0f * dampingFactor;
+		position.y = -1.0f + (radius / SCR_HEIGHT); // prevent bounce from below floor
+		velocity.y *= -1.0f * dampingFactor;
 
-		if (std::abs(velocity[1]) < 0.2f) { // prevent "infinite" bounce due to gravity
-			velocity[1] = 0.0f;
+		if (std::abs(velocity.y) < 0.2f) { // prevent "infinite" bounce due to gravity
+			velocity.y = 0.0f;
 		}
 	}
-	if (position[1] + (radius / SCR_HEIGHT) >= 1.0) // check top of screen 
+	if (position.y + (radius / SCR_HEIGHT) >= 1.0) // check top of screen 
 	{
-		position[1] = 1.0f - (radius / SCR_HEIGHT); // prevent bounce from above ceiling
-		velocity[1] *= -1.0f * dampingFactor;
+		position.y = 1.0f - (radius / SCR_HEIGHT); // prevent bounce from above ceiling
+		velocity.y *= -1.0f * dampingFactor;
 	}
 
 	// horizontal collision
-	if (position[0] - (radius / SCR_WIDTH) <= -1.0f) // check left side of screen 
+	if (position.x - (radius / SCR_WIDTH) <= -1.0f) // check left side of screen 
 	{
-		position[0] = -1.0f + (radius / SCR_WIDTH);
-		velocity[0] *= -1.0f * dampingFactor;
+		position.x = -1.0f + (radius / SCR_WIDTH);
+		velocity.x *= -1.0f * dampingFactor;
 	}
-	if (position[0] + (radius / SCR_WIDTH) >= 1.0f) // check right side of screen 
+	if (position.x + (radius / SCR_WIDTH) >= 1.0f) // check right side of screen 
 	{
-		position[0] = 1.0f - (radius / SCR_WIDTH);
-		velocity[0] *= -1.0f * dampingFactor;
+		position.x = 1.0f - (radius / SCR_WIDTH);
+		velocity.x *= -1.0f * dampingFactor;
 	}
 }
 
@@ -87,19 +87,16 @@ ParticleSystem::ParticleSystem(unsigned int SCREEN_WIDTH, unsigned int SCREEN_HE
 	SCR_WIDTH(SCREEN_WIDTH), SCR_HEIGHT(SCREEN_HEIGHT), ourShader(ourShader), VAO(VAO), VBO(VBO), particleRadius(particleRadius), numSides(numSides), 
 	dampingFactor(dampingFactor), numParticles(numParticles)
 {
-	std::vector<float> position = { 0.0f, 0.0f , 0.0f };
-	std::vector<float> velocity = { 0.0f, 0.0f , 0.0f };
+	glm::vec3 position(0.0f, 0.0f , 0.0f);
+	glm::vec3 velocity(0.0f, 0.0f , 0.0f);
 
 	for (int i = 0; i < numParticles; i++) {
-		position[0] = utils::randFloat(1);
-		position[1] = utils::randFloat(1);
-		velocity[0] = utils::randFloat(5);
+		position.x = utils::randFloat(1);
+		position.y = utils::randFloat(1);
+		velocity.x = utils::randFloat(5);
+		velocity.y = 0; 
 		velocities.push_back(velocity);
 		positions.push_back(position);
-		for (int i = 0; i <= 2; i++) {
-			std::cout << position[i] << ",";
-		}
-		std::cout << "" << std::endl;
 	}
 }
 

@@ -1,5 +1,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
 
 #include "shader_class.h"
 #include "particle.h"
@@ -49,7 +50,7 @@ int main() {
 
 	// Setup viewport
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); /// tell GLFW to use callback on every window resize
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // tell GLFW to use callback on every window resize
 	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // lock mouse to window
 
 	// Shader object
@@ -57,7 +58,7 @@ int main() {
 
 	unsigned int VBO, VAO;
 	glGenVertexArrays(1, &VAO); // create OpenGL obj of vertex array object
-	glGenBuffers(1, &VBO);      // "                 " vertex buffer object
+	glGenBuffers(1, &VBO);      // vertex buffer object
 
 
 	ParticleSystem particleSystem(SCREEN_WIDTH, SCREEN_HEIGHT, ourShader, VAO, VBO);
