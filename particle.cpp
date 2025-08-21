@@ -43,9 +43,9 @@ void Particle::drawCircle(unsigned int& VAO, unsigned int& VBO, Shader& ourShade
 
 void Particle::add_velocity(float deltaTime)
 {
-	// Update position
+	// Update position with velocity verlet
 	position.x += velocity.x * deltaTime;
-	position.y += velocity.y * deltaTime;
+	position.y += velocity.y * deltaTime + 0.5f * (-9.81f) * deltaTime * deltaTime;
 	velocity.y += (-9.81f) * deltaTime;
 }
 
