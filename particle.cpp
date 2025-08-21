@@ -5,6 +5,8 @@
 Particle::Particle(glm::vec3 position_, glm::vec3 velocity_, float radius_, int numSides_, const unsigned int SCREEN_WIDTH, const unsigned SCREEN_HEIGHT)
 	: position(position_), velocity(velocity_), radius(radius_), numSides(numSides_), SCR_WIDTH(SCREEN_WIDTH), SCR_HEIGHT(SCREEN_HEIGHT)
 {
+	prev_position = position - velocity * 0.05f; // fake one step back
+
 	numVertices = numSides + 2;
 
 	// Setup verticies vector
@@ -43,9 +45,9 @@ void Particle::drawCircle(unsigned int& VAO, unsigned int& VBO, Shader& ourShade
 
 void Particle::add_velocity(float deltaTime)
 {
-	// Update position
+	// Update position with velocity verlet
 	position.x += velocity.x * deltaTime;
-	position.y += velocity.y * deltaTime;
+	position.y += velocity.y * deltaTime + 0.5f * (-9.81f) * deltaTime * deltaTime;
 	velocity.y += (-9.81f) * deltaTime;
 }
 

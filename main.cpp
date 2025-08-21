@@ -61,7 +61,11 @@ int main() {
 	glGenBuffers(1, &VBO);      // vertex buffer object
 
 
-	ParticleSystem particleSystem(SCREEN_WIDTH, SCREEN_HEIGHT, ourShader, VAO, VBO);
+	float particleRadius = 25.0f;
+	int numSides = 50;
+	float dampingFactor = 0.85;
+	int numParticles = 19;
+	ParticleSystem particleSystem(SCREEN_WIDTH, SCREEN_HEIGHT, ourShader, VAO, VBO, particleRadius, numSides, dampingFactor, numParticles);
 	std::vector<Particle> particles = particleSystem.createParticles(); // create array of particle objects
 
 	// RENDERING LOOP
