@@ -5,8 +5,6 @@
 Particle::Particle(glm::vec3 position_, glm::vec3 velocity_, float radius_, int numSides_, const unsigned int SCREEN_WIDTH, const unsigned SCREEN_HEIGHT)
 	: position(position_), velocity(velocity_), radius(radius_), numSides(numSides_), SCR_WIDTH(SCREEN_WIDTH), SCR_HEIGHT(SCREEN_HEIGHT)
 {
-	prev_position = position - velocity * 0.05f; // fake one step back
-
 	numVertices = numSides + 2;
 
 	// Setup verticies vector

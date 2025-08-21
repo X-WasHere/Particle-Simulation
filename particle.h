@@ -12,10 +12,8 @@ class Particle
 //private:
 public:
 	glm::vec3 position;
-	glm::vec3 prev_position;
 	glm::vec3 velocity;
 	std::vector<float> vertices;
-	//std::vector<float> velocity;
 	unsigned int numSides;
 	int numVertices;
 	float radius;
