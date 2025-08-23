@@ -13,8 +13,8 @@
 #include <random>
 
 // screen settings
-const unsigned int SCREEN_WIDTH = 800;
-const unsigned int SCREEN_HEIGHT = 600;
+const unsigned int SCREEN_WIDTH = 1200;
+const unsigned int SCREEN_HEIGHT = 900;
 
 // timing 
 float deltaTime = 0.0f;
@@ -61,12 +61,16 @@ int main() {
 	glGenBuffers(1, &VBO);      // vertex buffer object
 
 
-	float particleRadius = 25.0f;
-	int numSides = 50;
+	float particleRadius = 10.0f;
+	int numSides = 100;
 	float dampingFactor = 0.85;
-	int numParticles = 19;
+	int numParticles = 100;
 	ParticleSystem particleSystem(SCREEN_WIDTH, SCREEN_HEIGHT, ourShader, VAO, VBO, particleRadius, numSides, dampingFactor, numParticles);
 	std::vector<Particle> particles = particleSystem.createParticles(); // create array of particle objects
+
+	// testing density
+	glm::vec3 samplePoint(0.0f, 0.0f, 0.0f);
+	float smoothingRadius = 1.0f;
 
 	// RENDERING LOOP
 	while (!glfwWindowShouldClose(window)) {
@@ -83,6 +87,7 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 
 		particleSystem.drawSystem(particles, ourShader, deltaTime);
+		float density = particleSystem.CalculateDensity(samplePoint, smoothingRadius);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents(); // check for event triggering
