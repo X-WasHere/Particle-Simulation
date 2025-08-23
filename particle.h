@@ -3,6 +3,7 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <vector>
+#include <cmath>
 
 #include "shader_class.h"
 #include "utils.h"
@@ -63,4 +64,6 @@ public:
 	// Member functions
 	std::vector<Particle> createParticles();
 	void drawSystem(std::vector<Particle>& particles, Shader& ourShader, float deltaTime);
+	float SmoothingKernel(float radius, float distance);
+	float CalculateDensity(glm::vec3 samplePoint, float smoothingRadius);
 };

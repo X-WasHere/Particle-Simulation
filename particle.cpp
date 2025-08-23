@@ -116,9 +116,32 @@ void ParticleSystem::drawSystem(std::vector<Particle>& particles, Shader& ourSha
 	for (Particle& particle : particles) {
 
 		setDeltaTime(deltaTime);
-		//std::cout << "Particle velocity : " << particle.velocity[0] << "," << particle.velocity[1] << std::endl;
 		particle.drawCircle(VAO, VBO, ourShader);
-		particle.add_velocity(deltaTime);
+		//particle.add_velocity(deltaTime);
 		particle.add_border_collision(dampingFactor);
 	}
+}
+
+float ParticleSystem::SmoothingKernel(float radius, float distance)
+{	
+	if (distance >= radius) { return 0; }
+
+	float densityFunctionVolume = (3.14159265359 * pow(radius, 4)) / 6;
+	float value = radius - distance;
+	return value * value * value / densityFunctionVolume; // smoothing
+}
+
+float ParticleSystem::CalculateDensity(glm::vec3 samplePoint, float smoothingRadius)
+{
+	float density = 0;
+	const float mass = 1; // for simplicity
+
+	for (int i = 0; i < positions.size(); i++) {
+		std::cout << positions[i].x << " " << positions[i].y << std::endl;
+		float distance = sqrt(glm::length(positions[i] - samplePoint)); 
+		float influence = SmoothingKernel(smoothingRadius, distance);
+		density += mass * influence;
+	}
+	std::cout << "Density is : " << density;
+	return density;
 }
