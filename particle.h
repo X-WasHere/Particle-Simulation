@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <vector>
 #include <cmath>
+#include <omp.h>
 
 #include "shader_class.h"
 #include "utils.h"
@@ -46,6 +47,8 @@ private:
 	std::vector<glm::vec3> positions;
 	std::vector<glm::vec3> velocities;
 
+	std::vector<float> densities;
+
 	// Screen settings and rendering
 	unsigned int SCR_WIDTH;
 	unsigned int SCR_HEIGHT;
@@ -66,4 +69,5 @@ public:
 	void drawSystem(std::vector<Particle>& particles, Shader& ourShader, float deltaTime);
 	float SmoothingKernel(float radius, float distance);
 	float CalculateDensity(glm::vec3 samplePoint, float smoothingRadius);
+	void UpdateDensity(float smoothingRadius);
 };

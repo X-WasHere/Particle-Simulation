@@ -98,6 +98,8 @@ ParticleSystem::ParticleSystem(unsigned int SCREEN_WIDTH, unsigned int SCREEN_HE
 		velocities.push_back(velocity);
 		positions.push_back(position);
 	}
+
+	densities.resize(numParticles);
 }
 
 std::vector<Particle> ParticleSystem::createParticles()
@@ -136,12 +138,20 @@ float ParticleSystem::CalculateDensity(glm::vec3 samplePoint, float smoothingRad
 	float density = 0;
 	const float mass = 1; // for simplicity
 
+#pragma omp parallel for reduction(+:density)
 	for (int i = 0; i < positions.size(); i++) {
-		std::cout << positions[i].x << " " << positions[i].y << std::endl;
-		float distance = sqrt(glm::length(positions[i] - samplePoint)); 
+		float distance = glm::length(positions[i] - samplePoint); 
 		float influence = SmoothingKernel(smoothingRadius, distance);
 		density += mass * influence;
 	}
-	std::cout << "Density is : " << density;
+	//std::cout << "Density is : " << density;
 	return density;
+}
+
+void ParticleSystem::UpdateDensity(float smoothingRadius)
+{
+//#pragma omp parallel for
+	for (int i = 0; i < positions.size(); i++) {
+		densities[i] = CalculateDensity(positions[i], smoothingRadius);
+	}
 }
