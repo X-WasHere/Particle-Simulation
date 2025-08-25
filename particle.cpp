@@ -170,3 +170,5 @@ void ParticleSystem::UpdateDensity(float smoothingRadius)
 		densities[i] = CalculateDensity(positions[i], smoothingRadius);
 	}
 }
+
+// TEST
