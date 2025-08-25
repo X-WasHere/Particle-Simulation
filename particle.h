@@ -43,6 +43,7 @@ private:
 	float particleRadius;
 	int numSides;
 	float dampingFactor;
+	const std::string& arrangement;
 	// Create array of positions and velocities 
 	std::vector<glm::vec3> positions;
 	std::vector<glm::vec3> velocities;
@@ -62,7 +63,7 @@ private:
 
 public:
 	ParticleSystem(unsigned int SCREEN_WIDTH, unsigned int SCREEN_HEIGHT, Shader& ourShader_, unsigned int& VAO, unsigned int& VBO,
-		float particleRadius = 25.0f, int numSides = 50, float dampingFactor = 0.85, int numParticles = 19);
+		float particleRadius = 25.0f, int numSides = 50, float dampingFactor = 0.85, int numParticles = 19, const std::string& arrangement = "random");
 
 	// Member functions
 	std::vector<Particle> createParticles();

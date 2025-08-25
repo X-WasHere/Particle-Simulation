@@ -92,11 +92,11 @@ int main() {
 		particleSystem.drawSystem(particles, ourShader, deltaTime);
 
 		// Get starting timepoint
-		auto start = high_resolution_clock::now();
+		//auto start = high_resolution_clock::now();
 		particleSystem.UpdateDensity(smoothingRadius);
-		auto stop = high_resolution_clock::now();
-		auto duration = duration_cast<milliseconds>(stop - start);
-		std::cout << "Time taken to update density: " << duration.count() << std::endl;
+		//auto stop = high_resolution_clock::now();
+		//auto duration = duration_cast<milliseconds>(stop - start);
+		//std::cout << "Time taken to update density: " << duration.count() << std::endl;
 
 		glfwSwapBuffers(window);
 		glfwPollEvents(); // check for event triggering
