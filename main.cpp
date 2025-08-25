@@ -12,6 +12,9 @@
 #include <vector>
 #include <random>
 
+#include <chrono>
+using namespace std::chrono;
+
 // screen settings
 const unsigned int SCREEN_WIDTH = 1200;
 const unsigned int SCREEN_HEIGHT = 900;
@@ -87,7 +90,13 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 
 		particleSystem.drawSystem(particles, ourShader, deltaTime);
-		float density = particleSystem.CalculateDensity(samplePoint, smoothingRadius);
+
+		// Get starting timepoint
+		//auto start = high_resolution_clock::now();
+		particleSystem.UpdateDensity(smoothingRadius);
+		//auto stop = high_resolution_clock::now();
+		//auto duration = duration_cast<milliseconds>(stop - start);
+		//std::cout << "Time taken to update density: " << duration.count() << std::endl;
 
 		glfwSwapBuffers(window);
 		glfwPollEvents(); // check for event triggering

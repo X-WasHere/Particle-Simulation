@@ -83,21 +83,39 @@ void Particle::add_border_collision(float dampingFactor)
 
 // ------------------ class ParticleSystem ------------------
 ParticleSystem::ParticleSystem(unsigned int SCREEN_WIDTH, unsigned int SCREEN_HEIGHT, Shader& ourShader, unsigned int& VAO, unsigned int& VBO,
-	float particleRadius, int numSides, float dampingFactor, int numParticles): 
+	float particleRadius, int numSides, float dampingFactor, int numParticles, const std::string& arrangement): 
 	SCR_WIDTH(SCREEN_WIDTH), SCR_HEIGHT(SCREEN_HEIGHT), ourShader(ourShader), VAO(VAO), VBO(VBO), particleRadius(particleRadius), numSides(numSides), 
-	dampingFactor(dampingFactor), numParticles(numParticles)
+	dampingFactor(dampingFactor), numParticles(numParticles), arrangement(arrangement)
 {
 	glm::vec3 position(0.0f, 0.0f , 0.0f);
 	glm::vec3 velocity(0.0f, 0.0f , 0.0f);
 
-	for (int i = 0; i < numParticles; i++) {
-		position.x = utils::randFloat(1);
-		position.y = utils::randFloat(1);
-		velocity.x = utils::randFloat(5);
-		velocity.y = 0; 
-		velocities.push_back(velocity);
-		positions.push_back(position);
+	densities.resize(numParticles);
+
+	// Arrange particles
+	try {
+		if (arrangement == "random") {
+			for (int i = 0; i < numParticles; i++) {
+				position.x = utils::randFloat(1);
+				position.y = utils::randFloat(1);
+				velocity.x = utils::randFloat(5);
+				velocity.y = 0;
+				velocities.push_back(velocity);
+				positions.push_back(position);
+			}
+		}
+		// TODO add grid arrangement
+		else if (arrangement == "grid") {
+			;
+		}
+		else {
+			throw(arrangement);
+		}
 	}
+	catch (const std::string& arrangement) {
+		std::cout << "Invalid arragement: " << arrangement << std::endl;
+	}
+
 }
 
 std::vector<Particle> ParticleSystem::createParticles()
@@ -126,9 +144,9 @@ float ParticleSystem::SmoothingKernel(float radius, float distance)
 {	
 	if (distance >= radius) { return 0; }
 
-	float densityFunctionVolume = (3.14159265359 * pow(radius, 4)) / 6;
+	float densityFunctionVolume = (3.14159265359 * pow(radius, 4)) / 2;
 	float value = radius - distance;
-	return value * value * value / densityFunctionVolume; // smoothing
+	return value * value * value / densityFunctionVolume;
 }
 
 float ParticleSystem::CalculateDensity(glm::vec3 samplePoint, float smoothingRadius)
@@ -136,12 +154,19 @@ float ParticleSystem::CalculateDensity(glm::vec3 samplePoint, float smoothingRad
 	float density = 0;
 	const float mass = 1; // for simplicity
 
+#pragma omp parallel for reduction(+:density)
 	for (int i = 0; i < positions.size(); i++) {
-		std::cout << positions[i].x << " " << positions[i].y << std::endl;
-		float distance = sqrt(glm::length(positions[i] - samplePoint)); 
+		float distance = glm::length(positions[i] - samplePoint); 
 		float influence = SmoothingKernel(smoothingRadius, distance);
 		density += mass * influence;
 	}
-	std::cout << "Density is : " << density;
+	std::cout << "Density is : " << density << std::endl;
 	return density;
+}
+
+void ParticleSystem::UpdateDensity(float smoothingRadius)
+{
+	for (int i = 0; i < positions.size(); i++) {
+		densities[i] = CalculateDensity(positions[i], smoothingRadius);
+	}
 }
