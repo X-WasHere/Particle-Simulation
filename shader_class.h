@@ -51,30 +51,30 @@ public:
 
 
 		// Compiile shaders
-		/// Vertex shader
+		// Vertex shader
 		unsigned int vertexShader;
 		vertexShader = glCreateShader(GL_VERTEX_SHADER);
-		glShaderSource(vertexShader, 1, &vShaderCode, NULL); /// copy shader code into shader object
+		glShaderSource(vertexShader, 1, &vShaderCode, NULL); // copy shader code into shader object
 		glCompileShader(vertexShader);
-		/// test vertex shader compilation
+		// test vertex shader compilation
 		checkCompilationErrors(vertexShader, "VERTEX");
 
-		/// Fragment shader
+		// Fragment shader
 		unsigned int fragmentShader;
 		fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 		glShaderSource(fragmentShader, 1, &fShaderCode, NULL);
 		glCompileShader(fragmentShader);
 
-		/// test fragment shader compilation
+		// test fragment shader compilation
 		checkCompilationErrors(fragmentShader, "FRAGMENT");
 
 
-		/// Shader program
+		// Shader program
 		shaderProgram = glCreateProgram();
 		glAttachShader(shaderProgram, vertexShader);
 		glAttachShader(shaderProgram, fragmentShader);
-		glLinkProgram(shaderProgram); /// link each shader output to input of next
-		/// test shader program compilation
+		glLinkProgram(shaderProgram); // link each shader output to input of next
+		// test shader program compilation
 		checkCompilationErrors(shaderProgram, "PROGRAM");
 
 		// Delete (now used) unwanted shader objects
