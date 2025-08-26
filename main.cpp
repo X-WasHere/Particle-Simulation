@@ -56,19 +56,24 @@ int main() {
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // tell GLFW to use callback on every window resize
 	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // lock mouse to window
 
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	// Shader object
 	Shader ourShader("shader.vs", "shader.fs");
+	ourShader.use();
+	ourShader.setFloat("opacity", 1.0f);
 
 	unsigned int VBO, VAO;
 	glGenVertexArrays(1, &VAO); // create OpenGL obj of vertex array object
 	glGenBuffers(1, &VBO);      // vertex buffer object
 
 
-	float particleRadius = 10.0f;
+	float particleRadius = 25.0f;
 	int numSides = 100;
 	float dampingFactor = 0.85;
-	int numParticles = 100;
-	ParticleSystem particleSystem(SCREEN_WIDTH, SCREEN_HEIGHT, ourShader, VAO, VBO, particleRadius, numSides, dampingFactor, numParticles);
+	int numParticles = 225;
+	ParticleSystem particleSystem(SCREEN_WIDTH, SCREEN_HEIGHT, ourShader, VAO, VBO, particleRadius, numSides, dampingFactor, numParticles, "grid");
 	std::vector<Particle> particles = particleSystem.createParticles(); // create array of particle objects
 
 	// testing density
@@ -90,13 +95,6 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 
 		particleSystem.drawSystem(particles, ourShader, deltaTime);
-
-		// Get starting timepoint
-		//auto start = high_resolution_clock::now();
-		particleSystem.UpdateDensity(smoothingRadius);
-		//auto stop = high_resolution_clock::now();
-		//auto duration = duration_cast<milliseconds>(stop - start);
-		//std::cout << "Time taken to update density: " << duration.count() << std::endl;
 
 		glfwSwapBuffers(window);
 		glfwPollEvents(); // check for event triggering

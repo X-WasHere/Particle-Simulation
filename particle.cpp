@@ -104,9 +104,21 @@ ParticleSystem::ParticleSystem(unsigned int SCREEN_WIDTH, unsigned int SCREEN_HE
 				positions.push_back(position);
 			}
 		}
-		// TODO add grid arrangement
 		else if (arrangement == "grid") {
-			;
+			float gridDim = sqrt(numParticles);
+			float spacing = 4 * particleRadius;
+			float offset = ((spacing * gridDim) - 2 * particleRadius) / 2;
+			for (int i = 0; i < static_cast<int>(gridDim); i++) {
+				for (int j = 0; j < static_cast<int>(gridDim); j++) {
+					position.x = (i * spacing / SCR_WIDTH) - (offset / SCR_WIDTH);
+					position.y = (j * spacing / SCR_HEIGHT) - (offset / SCR_HEIGHT);
+					positions.push_back(position);
+
+					velocity.x = utils::randFloat(5);
+					velocity.y = 0;
+					velocities.push_back(velocity);
+				}
+			}
 		}
 		else {
 			throw(arrangement);
@@ -135,7 +147,7 @@ void ParticleSystem::drawSystem(std::vector<Particle>& particles, Shader& ourSha
 
 		setDeltaTime(deltaTime);
 		particle.drawCircle(VAO, VBO, ourShader);
-		//particle.add_velocity(deltaTime);
+		particle.add_velocity(deltaTime);
 		particle.add_border_collision(dampingFactor);
 	}
 }
@@ -170,5 +182,3 @@ void ParticleSystem::UpdateDensity(float smoothingRadius)
 		densities[i] = CalculateDensity(positions[i], smoothingRadius);
 	}
 }
-
-// TEST
