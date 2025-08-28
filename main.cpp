@@ -12,11 +12,8 @@
 #include <vector>
 #include <random>
 
-#include <chrono>
-using namespace std::chrono;
-
 // screen settings
-const unsigned int SCREEN_WIDTH = 1200;
+const unsigned int SCREEN_WIDTH = 900;
 const unsigned int SCREEN_HEIGHT = 900;
 
 // timing 
@@ -26,6 +23,7 @@ float lastFrame = 0.0f;
 // functions
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
+
 
 int main() {
 	// GLFW setup
@@ -54,7 +52,6 @@ int main() {
 	// Setup viewport
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // tell GLFW to use callback on every window resize
-	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // lock mouse to window
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -68,16 +65,14 @@ int main() {
 	glGenVertexArrays(1, &VAO); // create OpenGL obj of vertex array object
 	glGenBuffers(1, &VBO);      // vertex buffer object
 
-
-	float particleRadius = 25.0f;
+	float particleRadius = 10.0f;
 	int numSides = 100;
 	float dampingFactor = 0.85;
-	int numParticles = 225;
-	ParticleSystem particleSystem(SCREEN_WIDTH, SCREEN_HEIGHT, ourShader, VAO, VBO, particleRadius, numSides, dampingFactor, numParticles, "grid");
+	int numParticles = 900;
+	ParticleSystem particleSystem(SCREEN_WIDTH, SCREEN_HEIGHT, ourShader, VAO, VBO, particleRadius, numSides, dampingFactor, numParticles);
 	std::vector<Particle> particles = particleSystem.createParticles(); // create array of particle objects
 
-	// testing density
-	glm::vec3 samplePoint(0.0f, 0.0f, 0.0f);
+
 	float smoothingRadius = 1.0f;
 
 	// RENDERING LOOP
@@ -91,7 +86,7 @@ int main() {
 
 		processInput(window);
 
-		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 
 		particleSystem.drawSystem(particles, ourShader, deltaTime);
