@@ -2,7 +2,7 @@
 
 // ------------------ class Particle ------------------
 // Constructor sets up circle vertices vector with initial xyz position
-Particle::Particle(glm::vec3 position_, glm::vec3 velocity_, float radius_, int numSides_, const unsigned int SCREEN_WIDTH, const unsigned SCREEN_HEIGHT)
+Particle::Particle(glm::vec3 position_, glm::vec3 velocity_, float radius_, int numSides_, const unsigned int SCREEN_WIDTH, const unsigned int SCREEN_HEIGHT)
 	: position(position_), velocity(velocity_), radius(radius_), numSides(numSides_), SCR_WIDTH(SCREEN_WIDTH), SCR_HEIGHT(SCREEN_HEIGHT)
 {
 	numVertices = numSides + 2;
@@ -19,7 +19,7 @@ void Particle::drawCircle(unsigned int& VAO, unsigned int& VBO, Shader& ourShade
 	float doublePi = 2.0f * 3.141592653f;
 	vertices.clear();
 	// Trigonometry to calculate vertices (rememeber 0,0 is centre) 
-	for (int i = 1; i < numVertices; i++) {
+	for (int i = 1; i <= numVertices; i++) {
 		vertices.push_back(position.x + (radius * cos(i * doublePi / numSides)) / SCR_WIDTH); // remember that screen dimensions are normalised
 		vertices.push_back(position.y + (radius * sin(i * doublePi / numSides)) / SCR_HEIGHT); // verticies must be {-1, 1}
 		vertices.push_back(position.z);
@@ -107,7 +107,8 @@ ParticleSystem::ParticleSystem(unsigned int SCREEN_WIDTH, unsigned int SCREEN_HE
 		else if (arrangement == "grid") {
 			float gridDim = sqrt(numParticles);
 			float spacing = 4 * particleRadius;
-			float offset = ((spacing * gridDim) - 2 * particleRadius) / 2;
+			float offset = (spacing * (gridDim - 1)) / 2;
+
 			for (int i = 0; i < static_cast<int>(gridDim); i++) {
 				for (int j = 0; j < static_cast<int>(gridDim); j++) {
 					position.x = (i * spacing / SCR_WIDTH) - (offset / SCR_WIDTH);
@@ -147,21 +148,21 @@ void ParticleSystem::drawSystem(std::vector<Particle>& particles, Shader& ourSha
 
 		setDeltaTime(deltaTime);
 		particle.drawCircle(VAO, VBO, ourShader);
-		particle.add_velocity(deltaTime);
+		//particle.add_velocity(deltaTime);
 		particle.add_border_collision(dampingFactor);
 	}
 }
 
-float ParticleSystem::SmoothingKernel(float radius, float distance)
+float ParticleSystem::smoothingKernel(float radius, float distance)
 {	
 	if (distance >= radius) { return 0; }
 
-	float densityFunctionVolume = (3.14159265359 * pow(radius, 4)) / 2;
+	float densityFunctionVolume = (3.14159265359 * pow(radius, 5)) / 10;
 	float value = radius - distance;
 	return value * value * value / densityFunctionVolume;
 }
 
-float ParticleSystem::CalculateDensity(glm::vec3 samplePoint, float smoothingRadius)
+float ParticleSystem::calculateDensity(glm::vec3 samplePoint, float smoothingRadius)
 {
 	float density = 0;
 	const float mass = 1; // for simplicity
@@ -169,16 +170,17 @@ float ParticleSystem::CalculateDensity(glm::vec3 samplePoint, float smoothingRad
 #pragma omp parallel for reduction(+:density)
 	for (int i = 0; i < positions.size(); i++) {
 		float distance = glm::length(positions[i] - samplePoint); 
-		float influence = SmoothingKernel(smoothingRadius, distance);
+		float influence = smoothingKernel(smoothingRadius, distance);
 		density += mass * influence;
 	}
 	std::cout << "Density is : " << density << std::endl;
 	return density;
 }
 
-void ParticleSystem::UpdateDensity(float smoothingRadius)
+void ParticleSystem::updateDensity(float smoothingRadius)
 {
+	// calculate density for every particle due to influence of all other particles
 	for (int i = 0; i < positions.size(); i++) {
-		densities[i] = CalculateDensity(positions[i], smoothingRadius);
+		densities[i] = calculateDensity(positions[i], smoothingRadius);
 	}
 }

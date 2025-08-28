@@ -11,8 +11,7 @@
 
 class Particle
 {
-//private:
-public:
+private:
 	glm::vec3 position;
 	glm::vec3 velocity;
 	std::vector<float> vertices;
@@ -23,8 +22,7 @@ public:
 	unsigned int SCR_WIDTH;
 	unsigned int SCR_HEIGHT;
 
-//public:
-
+public:
 	// Constructor sets up circle vertices vector with initial xyz position
 	Particle(glm::vec3 position_, glm::vec3 velocity_, float radius_, int numSides_, const unsigned int SCREEN_WIDTH, const unsigned SCREEN_HEIGHT);
 
@@ -68,7 +66,7 @@ public:
 	// Member functions
 	std::vector<Particle> createParticles();
 	void drawSystem(std::vector<Particle>& particles, Shader& ourShader, float deltaTime);
-	float SmoothingKernel(float radius, float distance);
-	float CalculateDensity(glm::vec3 samplePoint, float smoothingRadius);
-	void UpdateDensity(float smoothingRadius);
+	float smoothingKernel(float radius, float distance);
+	float calculateDensity(glm::vec3 samplePoint, float smoothingRadius);
+	void updateDensity(float smoothingRadius);
 };
