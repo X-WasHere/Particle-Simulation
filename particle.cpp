@@ -162,6 +162,12 @@ float ParticleSystem::smoothingKernel(float radius, float distance)
 	return value * value * value / densityFunctionVolume;
 }
 
+// TODO implement gradient
+float ParticleSystem::smoothingKernelDerivative(float radius, float distance) 
+{
+
+}
+
 float ParticleSystem::calculateDensity(glm::vec3 samplePoint, float smoothingRadius)
 {
 	float density = 0;

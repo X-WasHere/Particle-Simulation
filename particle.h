@@ -67,6 +67,7 @@ public:
 	std::vector<Particle> createParticles();
 	void drawSystem(std::vector<Particle>& particles, Shader& ourShader, float deltaTime);
 	float smoothingKernel(float radius, float distance);
+	float smoothingKernelDerivative(float radius, float distance);
 	float calculateDensity(glm::vec3 samplePoint, float smoothingRadius);
 	void updateDensity(float smoothingRadius);
 };

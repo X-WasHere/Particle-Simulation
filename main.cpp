@@ -12,9 +12,6 @@
 #include <vector>
 #include <random>
 
-#include <chrono>
-using namespace std::chrono;
-
 // screen settings
 const unsigned int SCREEN_WIDTH = 900;
 const unsigned int SCREEN_HEIGHT = 900;
