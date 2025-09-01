@@ -153,40 +153,65 @@ void ParticleSystem::drawSystem(std::vector<Particle>& particles, Shader& ourSha
 	}
 }
 
-float ParticleSystem::smoothingKernel(float radius, float distance)
+float ParticleSystem::smoothingKernel(float distance)
 {	
-	if (distance >= radius) { return 0; }
+	if (distance >= smoothingRadius) { return 0; }
 
-	float densityFunctionVolume = (3.14159265359 * pow(radius, 5)) / 10;
-	float value = radius - distance;
-	return value * value * value / densityFunctionVolume;
+	float densityFunctionVolume = (3.14159265359 * pow(smoothingRadius, 5)) / 10;
+	float f = smoothingRadius - distance;
+	return f * f * f / densityFunctionVolume;
 }
 
-// TODO implement gradient
-float ParticleSystem::smoothingKernelDerivative(float radius, float distance) 
+float ParticleSystem::smoothingKernelDerivative(float distance)
 {
-
+	if (distance >= smoothingRadius) { return 0; }
+	
+	float k = -30 / (3.14159265359 * pow(smoothingRadius, 5)); // normalisation
+	float f = smoothingRadius - distance; // kernel function
+	return k * f * f;
 }
 
-float ParticleSystem::calculateDensity(glm::vec3 samplePoint, float smoothingRadius)
+float ParticleSystem::calculateDensity(glm::vec3 samplePoint)
 {
 	float density = 0;
-	const float mass = 1; // for simplicity
 
 #pragma omp parallel for reduction(+:density)
 	for (int i = 0; i < positions.size(); i++) {
 		float distance = glm::length(positions[i] - samplePoint); 
-		float influence = smoothingKernel(smoothingRadius, distance);
+		float influence = smoothingKernel(distance);
 		density += mass * influence;
 	}
 	std::cout << "Density is : " << density << std::endl;
 	return density;
 }
 
-void ParticleSystem::updateDensity(float smoothingRadius)
+float ParticleSystem::convertDensityToPressure(float density)
+{
+	float densityError = density - restDensity;
+	float pressure = gasConstant * densityError;
+	return pressure;
+}
+
+glm::vec3 ParticleSystem::calculatePressureForce(glm::vec3 samplePoint)
+{
+	glm::vec3 pressureForce(0.0f, 0.0f, 0.0f);
+
+	// Do something
+	for (int i = 0; i < positions.size(); i++) {
+		float distance = glm::length(positions[i] - samplePoint);
+		glm::vec3 direction((positions[i] - samplePoint)/ distance); // unit vector
+		float grad = smoothingKernelDerivative(distance);
+		float density = densities[i];
+		pressureForce += -convertDensityToPressure(density) * mass * grad * direction / density;
+	}
+
+	return pressureForce;
+}
+
+void ParticleSystem::updateDensity()
 {
 	// calculate density for every particle due to influence of all other particles
 	for (int i = 0; i < positions.size(); i++) {
-		densities[i] = calculateDensity(positions[i], smoothingRadius);
+		densities[i] = calculateDensity(positions[i]);
 	}
 }
