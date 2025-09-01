@@ -24,7 +24,7 @@ private:
 
 public:
 	// Constructor sets up circle vertices vector with initial xyz position
-	Particle(glm::vec3 position_, glm::vec3 velocity_, float radius_, int numSides_, const unsigned int SCREEN_WIDTH, const unsigned SCREEN_HEIGHT);
+	Particle(glm::vec3 position_, glm::vec3 velocity_, float radius_, int numSides_, const unsigned int SCREEN_WIDTH, const unsigned int SCREEN_HEIGHT);
 
 	// Member functions 
 	void drawCircle(unsigned int& VAO, unsigned int& VBO, Shader& ourShader);
@@ -46,6 +46,7 @@ private:
 	std::vector<glm::vec3> positions;
 	std::vector<glm::vec3> velocities;
 
+	// fluid properties
 	std::vector<float> densities;
 
 	// Screen settings and rendering
@@ -63,11 +64,20 @@ public:
 	ParticleSystem(unsigned int SCREEN_WIDTH, unsigned int SCREEN_HEIGHT, Shader& ourShader_, unsigned int& VAO, unsigned int& VBO,
 		float particleRadius = 25.0f, int numSides = 50, float dampingFactor = 0.85, int numParticles = 19, const std::string& arrangement = "random");
 
+	// TODO : move to private and add setter functions
+	float gasConstant = 0.0f; // some pressure multiplier
+	float restDensity = 400.0f; // target density (400 is the standard grid arrangment)
+	float smoothingRadius = 1.0f;
+	const float mass = 1.0f; // for simplicity
+	
+
 	// Member functions
 	std::vector<Particle> createParticles();
 	void drawSystem(std::vector<Particle>& particles, Shader& ourShader, float deltaTime);
-	float smoothingKernel(float radius, float distance);
-	float smoothingKernelDerivative(float radius, float distance);
-	float calculateDensity(glm::vec3 samplePoint, float smoothingRadius);
-	void updateDensity(float smoothingRadius);
+	float smoothingKernel(float distance);
+	float smoothingKernelDerivative(float distance);
+	float calculateDensity(glm::vec3 samplePoint);
+	float convertDensityToPressure(float density);
+	glm::vec3 calculatePressureForce(glm::vec3 samplePoint);
+	void updateDensity();
 };
