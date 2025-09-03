@@ -67,13 +67,13 @@ int main() {
 
 	float particleRadius = 10.0f;
 	int numSides = 100;
-	float dampingFactor = 0.85;
-	int numParticles = 900;
+	float dampingFactor = 1.0f;
+	int numParticles = 100;
 	ParticleSystem particleSystem(SCREEN_WIDTH, SCREEN_HEIGHT, ourShader, VAO, VBO, particleRadius, numSides, dampingFactor, numParticles, "grid");
 	std::vector<Particle> particles = particleSystem.createParticles(); // create array of particle objects
 
 
-	float smoothingRadius = 1.0f;
+	float smoothingRadius = 0.5f;
 
 	// RENDERING LOOP
 	while (!glfwWindowShouldClose(window)) {
@@ -89,8 +89,8 @@ int main() {
 		glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 
+		particleSystem.simulationStep(deltaTime, particles);
 		particleSystem.drawSystem(particles, ourShader, deltaTime);
-		particleSystem.calculateDensity(glm::vec3(0.0f, 0.0f, 0.0f));
 
 		glfwSwapBuffers(window);
 		glfwPollEvents(); // check for event triggering

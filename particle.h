@@ -30,6 +30,8 @@ public:
 	void drawCircle(unsigned int& VAO, unsigned int& VBO, Shader& ourShader);
 	void add_velocity(float deltaTime);
 	void add_border_collision(float dampingFactor);
+
+	friend class ParticleSystem;
 };
 
 
@@ -65,8 +67,8 @@ public:
 		float particleRadius = 25.0f, int numSides = 50, float dampingFactor = 0.85, int numParticles = 19, const std::string& arrangement = "random");
 
 	// TODO : move to private and add setter functions
-	float gasConstant = 0.0f; // some pressure multiplier
-	float restDensity = 400.0f; // target density (400 is the standard grid arrangment)
+	float gasConstant = 0.5f; // pressure multiplier
+	float restDensity = 130.0f; // target density 
 	float smoothingRadius = 1.0f;
 	const float mass = 1.0f; // for simplicity
 	
@@ -80,4 +82,5 @@ public:
 	float convertDensityToPressure(float density);
 	glm::vec3 calculatePressureForce(glm::vec3 samplePoint);
 	void updateDensity();
+	void simulationStep(float deltaTime, std::vector<Particle>& particles);
 };

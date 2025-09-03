@@ -45,8 +45,8 @@ void Particle::add_velocity(float deltaTime)
 {
 	// Update position with velocity verlet
 	position.x += velocity.x * deltaTime;
-	position.y += velocity.y * deltaTime + 0.5f * (-9.81f) * deltaTime * deltaTime;
-	velocity.y += (-9.81f) * deltaTime;
+	position.y += velocity.y * deltaTime; /*+ 0.5f * (-9.81f) * deltaTime * deltaTime;*/
+	//velocity.y += (-9.81f) * deltaTime;
 }
 
 void Particle::add_border_collision(float dampingFactor)
@@ -57,9 +57,9 @@ void Particle::add_border_collision(float dampingFactor)
 		position.y = -1.0f + (radius / SCR_HEIGHT); // prevent bounce from below floor
 		velocity.y *= -1.0f * dampingFactor;
 
-		if (std::abs(velocity.y) < 0.2f) { // prevent "infinite" bounce due to gravity
-			velocity.y = 0.0f;
-		}
+		//if (std::abs(velocity.y) < 0.2f) { // prevent "infinite" bounce due to gravity
+		//	velocity.y = 0.0f;
+		//}
 	}
 	if (position.y + (radius / SCR_HEIGHT) >= 1.0) // check top of screen 
 	{
@@ -99,7 +99,7 @@ ParticleSystem::ParticleSystem(unsigned int SCREEN_WIDTH, unsigned int SCREEN_HE
 				position.x = utils::randFloat(1);
 				position.y = utils::randFloat(1);
 				velocity.x = utils::randFloat(5);
-				velocity.y = 0;
+				velocity.y = utils::randFloat(5);
 				velocities.push_back(velocity);
 				positions.push_back(position);
 			}
@@ -116,7 +116,7 @@ ParticleSystem::ParticleSystem(unsigned int SCREEN_WIDTH, unsigned int SCREEN_HE
 					positions.push_back(position);
 
 					velocity.x = utils::randFloat(5);
-					velocity.y = 0;
+					velocity.y = utils::randFloat(5);
 					velocities.push_back(velocity);
 				}
 			}
@@ -147,9 +147,9 @@ void ParticleSystem::drawSystem(std::vector<Particle>& particles, Shader& ourSha
 	for (Particle& particle : particles) {
 
 		setDeltaTime(deltaTime);
-		particle.drawCircle(VAO, VBO, ourShader);
-		//particle.add_velocity(deltaTime);
+		particle.add_velocity(deltaTime);
 		particle.add_border_collision(dampingFactor);
+		particle.drawCircle(VAO, VBO, ourShader);
 	}
 }
 
@@ -196,8 +196,9 @@ glm::vec3 ParticleSystem::calculatePressureForce(glm::vec3 samplePoint)
 {
 	glm::vec3 pressureForce(0.0f, 0.0f, 0.0f);
 
-	// Do something
+#pragma omp parallel for reduction(+:pressureForce)
 	for (int i = 0; i < positions.size(); i++) {
+		if (positions[i] == samplePoint) { continue; } // TODO change to compare just indices
 		float distance = glm::length(positions[i] - samplePoint);
 		glm::vec3 direction((positions[i] - samplePoint)/ distance); // unit vector
 		float grad = smoothingKernelDerivative(distance);
@@ -213,5 +214,23 @@ void ParticleSystem::updateDensity()
 	// calculate density for every particle due to influence of all other particles
 	for (int i = 0; i < positions.size(); i++) {
 		densities[i] = calculateDensity(positions[i]);
+	}
+}
+
+void ParticleSystem::simulationStep(float deltaTime, std::vector<Particle>& particles)
+{
+	setDeltaTime(deltaTime);
+	
+	// 1.0 Calculate cached densities
+	updateDensity();
+
+	// 2.0 Calculate and apply pressure force 
+	for (int i = 0; i < positions.size(); i++) {
+		glm::vec3 pressureForce = calculatePressureForce(positions[i]);
+		glm::vec3 pressureAcceleration = pressureForce / densities[i];
+		velocities[i] += pressureAcceleration * deltaTime;
+
+		particles[i].position = positions[i];
+		particles[i].velocity = velocities[i];
 	}
 }
