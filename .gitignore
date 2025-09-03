@@ -7,9 +7,6 @@ build/
 *.obj
 *.o
 *.log
-*.vcxproj
-*.vcxproj.filters
-*.sln
 CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake
