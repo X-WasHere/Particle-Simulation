@@ -107,12 +107,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\C++_Libraries\Include;C:\Users\afsho\source\repos\opengl_getting_started\include;C:\Users\afsho\source\repos\opengl_getting_started\include\stb_image.h;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\C++_Libraries\Include;$(ProjectDir)include;C:\Users\afsho\source\repos\opengl_getting_started\include\stb_image.h;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);opengl32.lib;glfw3.lib;user32.lib;shell32.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);opengl32.lib;glfw3dll.lib;user32.lib;shell32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\C++_Libraries\Libs\lib-vc2022;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
