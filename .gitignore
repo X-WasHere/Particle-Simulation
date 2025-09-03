@@ -7,7 +7,7 @@ build/
 *.obj
 *.o
 *.log
-*.vcxproj
+*.vcxpro
 *.vcxproj.filters
 *.sln
 CMakeFiles/
