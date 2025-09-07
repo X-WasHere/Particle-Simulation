@@ -1,7 +1,10 @@
 #pragma once
 
+#define GLM_ENABLE_EXPERIMENTAL
+
 #include <glad/glad.h>
 #include <glm/glm.hpp>
+#include <glm/gtx/string_cast.hpp>
 #include <vector>
 #include <cmath>
 #include <omp.h>
@@ -12,8 +15,8 @@
 class Particle
 {
 private:
-	glm::vec3 position;
-	glm::vec3 velocity;
+	glm::vec3* position;
+	glm::vec3* velocity;
 	std::vector<float> vertices;
 	unsigned int numSides;
 	int numVertices;
@@ -24,11 +27,11 @@ private:
 
 public:
 	// Constructor sets up circle vertices vector with initial xyz position
-	Particle(glm::vec3 position_, glm::vec3 velocity_, float radius_, int numSides_, const unsigned int SCREEN_WIDTH, const unsigned int SCREEN_HEIGHT);
+	Particle(glm::vec3* position_, glm::vec3* velocity_, float radius_, int numSides_, const unsigned int SCREEN_WIDTH, const unsigned int SCREEN_HEIGHT);
 
 	// Member functions 
 	void drawCircle(unsigned int& VAO, unsigned int& VBO, Shader& ourShader);
-	void add_velocity(float deltaTime);
+	void add_gravity(float deltaTime);
 	void add_border_collision(float dampingFactor);
 };
 
@@ -65,8 +68,8 @@ public:
 		float particleRadius = 25.0f, int numSides = 50, float dampingFactor = 0.85, int numParticles = 19, const std::string& arrangement = "random");
 
 	// TODO : move to private and add setter functions
-	float gasConstant = 0.0f; // some pressure multiplier
-	float restDensity = 400.0f; // target density (400 is the standard grid arrangment)
+	float gasConstant = 1.0f; // some pressure multiplier
+	float restDensity = 100.0f; // target density (400 is the standard grid arrangment)
 	float smoothingRadius = 1.0f;
 	const float mass = 1.0f; // for simplicity
 	
@@ -74,10 +77,13 @@ public:
 	// Member functions
 	std::vector<Particle> createParticles();
 	void drawSystem(std::vector<Particle>& particles, Shader& ourShader, float deltaTime);
+
 	float smoothingKernel(float distance);
 	float smoothingKernelDerivative(float distance);
-	float calculateDensity(glm::vec3 samplePoint);
+	float calculateDensity(int particleIndex);
 	float convertDensityToPressure(float density);
-	glm::vec3 calculatePressureForce(glm::vec3 samplePoint);
+	glm::vec3 calculatePressureForce(int particleIndex);
+
 	void updateDensity();
+	void simulationStep(std::vector<Particle>& particles, float deltaTime);
 };
