@@ -89,8 +89,9 @@ int main() {
 		glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 
+		// Simulation step
+		particleSystem.simulationStep(particles, deltaTime);
 		particleSystem.drawSystem(particles, ourShader, deltaTime);
-		particleSystem.calculateDensity(glm::vec3(0.0f, 0.0f, 0.0f));
 
 		glfwSwapBuffers(window);
 		glfwPollEvents(); // check for event triggering
