@@ -150,8 +150,6 @@ void ParticleSystem::drawSystem(std::vector<Particle>& particles, Shader& ourSha
 	{
 		setDeltaTime(deltaTime);
 		particle.drawCircle(VAO, VBO, ourShader);
-		//particle.add_gravity(deltaTime);
-		//particle.add_border_collision(dampingFactor);
 	}
 }
 
@@ -159,18 +157,26 @@ float ParticleSystem::smoothingKernel(float distance)
 {	
 	if (distance >= smoothingRadius) { return 0; }
 
-	float densityFunctionVolume = (3.14159265359 * pow(smoothingRadius, 5)) / 10;
-	float f = smoothingRadius - distance;
-	return f * f * f / densityFunctionVolume;
+	//float densityFunctionVolume = (3.14159265359 * pow(smoothingRadius, 5)) / 10;
+	//float f = smoothingRadius - distance;
+	//return f * f * f / densityFunctionVolume;
+
+	// Quadratic smoothing kernel
+	float volume = (3.14159265359 * pow(smoothingRadius, 4)) / 6;
+	return (smoothingRadius - distance) * (smoothingRadius * distance) / volume;
 }
 
 float ParticleSystem::smoothingKernelDerivative(float distance)
 {
 	if (distance >= smoothingRadius) { return 0; }
 	
-	float k = -30 / (3.14159265359 * pow(smoothingRadius, 5)); // normalisation
-	float f = smoothingRadius - distance; // kernel function
-	return k * f * f;
+	//float k = -30 / (3.14159265359 * pow(smoothingRadius, 5)); // normalisation
+	//float f = smoothingRadius - distance; // kernel function
+	//return k * f * f;
+
+	// Quadratic smoothing kernel
+	float scale = 12 / (pow(smoothingRadius, 4) * 3.14159265359);
+	return (distance - smoothingRadius) * scale;
 }
 
 float ParticleSystem::calculateDensity(int particleIndex)
@@ -248,12 +254,4 @@ void ParticleSystem::simulationStep(std::vector<Particle>& particles, float delt
 		particles[i].add_border_collision(dampingFactor);
 		particles[i].add_gravity(deltaTime);
 	}
-
-	// Update positions, resolve collisions and add gravity
-	//for (int i = 0; i < positions.size(); i++)
-	//{
-	//	positions[i] += velocities[i] * deltaTime;
-	//	particles[i].add_border_collision(dampingFactor);
-	//	//particles[i].add_gravity(deltaTime);
-	//}
 }

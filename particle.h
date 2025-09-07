@@ -68,7 +68,7 @@ public:
 		float particleRadius = 25.0f, int numSides = 50, float dampingFactor = 0.85, int numParticles = 19, const std::string& arrangement = "random");
 
 	// TODO : move to private and add setter functions
-	float gasConstant = 1.0f; // some pressure multiplier
+	float gasConstant = 3.0f; // some pressure multiplier
 	float restDensity = 100.0f; // target density (400 is the standard grid arrangment)
 	float smoothingRadius = 1.0f;
 	const float mass = 1.0f; // for simplicity
