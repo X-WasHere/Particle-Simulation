@@ -190,7 +190,7 @@ float ParticleSystem::calculateDensity(int particleIndex)
 		float influence = smoothingKernel(distance);
 		density += mass * influence;
 	}
-	std::cout << "Density is : " << density << std::endl;
+	//std::cout << "Density is : " << density << std::endl;
 	return density;
 }
 
@@ -245,7 +245,7 @@ void ParticleSystem::simulationStep(std::vector<Particle>& particles, float delt
 	{
 		// Calculate and apply pressure forces
 		glm::vec3 pressureForce = calculatePressureForce(i);
-		std::cout << glm::to_string(pressureForce) << std::endl;
+		//std::cout << glm::to_string(pressureForce) << std::endl;
 		glm::vec3 pressureAcceleration = pressureForce / densities[i];
 		velocities[i] += pressureAcceleration * deltaTime;
 
