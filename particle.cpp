@@ -150,8 +150,6 @@ void ParticleSystem::drawSystem(std::vector<Particle>& particles, Shader& ourSha
 	{
 		setDeltaTime(deltaTime);
 		particle.drawCircle(VAO, VBO, ourShader);
-		//particle.add_gravity(deltaTime);
-		//particle.add_border_collision(dampingFactor);
 	}
 }
 
@@ -159,18 +157,26 @@ float ParticleSystem::smoothingKernel(float distance)
 {	
 	if (distance >= smoothingRadius) { return 0; }
 
-	float densityFunctionVolume = (3.14159265359 * pow(smoothingRadius, 5)) / 10;
-	float f = smoothingRadius - distance;
-	return f * f * f / densityFunctionVolume;
+	//float densityFunctionVolume = (3.14159265359 * pow(smoothingRadius, 5)) / 10;
+	//float f = smoothingRadius - distance;
+	//return f * f * f / densityFunctionVolume;
+
+	// Quadratic smoothing kernel
+	float volume = (3.14159265359 * pow(smoothingRadius, 4)) / 6;
+	return (smoothingRadius - distance) * (smoothingRadius * distance) / volume;
 }
 
 float ParticleSystem::smoothingKernelDerivative(float distance)
 {
 	if (distance >= smoothingRadius) { return 0; }
 	
-	float k = -30 / (3.14159265359 * pow(smoothingRadius, 5)); // normalisation
-	float f = smoothingRadius - distance; // kernel function
-	return k * f * f;
+	//float k = -30 / (3.14159265359 * pow(smoothingRadius, 5)); // normalisation
+	//float f = smoothingRadius - distance; // kernel function
+	//return k * f * f;
+
+	// Quadratic smoothing kernel
+	float scale = 12 / (pow(smoothingRadius, 4) * 3.14159265359);
+	return (distance - smoothingRadius) * scale;
 }
 
 float ParticleSystem::calculateDensity(int particleIndex)
@@ -184,7 +190,7 @@ float ParticleSystem::calculateDensity(int particleIndex)
 		float influence = smoothingKernel(distance);
 		density += mass * influence;
 	}
-	std::cout << "Density is : " << density << std::endl;
+	//std::cout << "Density is : " << density << std::endl;
 	return density;
 }
 
@@ -239,7 +245,7 @@ void ParticleSystem::simulationStep(std::vector<Particle>& particles, float delt
 	{
 		// Calculate and apply pressure forces
 		glm::vec3 pressureForce = calculatePressureForce(i);
-		std::cout << glm::to_string(pressureForce) << std::endl;
+		//std::cout << glm::to_string(pressureForce) << std::endl;
 		glm::vec3 pressureAcceleration = pressureForce / densities[i];
 		velocities[i] += pressureAcceleration * deltaTime;
 
@@ -248,12 +254,4 @@ void ParticleSystem::simulationStep(std::vector<Particle>& particles, float delt
 		particles[i].add_border_collision(dampingFactor);
 		particles[i].add_gravity(deltaTime);
 	}
-
-	// Update positions, resolve collisions and add gravity
-	//for (int i = 0; i < positions.size(); i++)
-	//{
-	//	positions[i] += velocities[i] * deltaTime;
-	//	particles[i].add_border_collision(dampingFactor);
-	//	//particles[i].add_gravity(deltaTime);
-	//}
 }

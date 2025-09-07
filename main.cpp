@@ -23,6 +23,7 @@ float lastFrame = 0.0f;
 // functions
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
+void calculateFPS(float deltaTime);
 
 
 int main() {
@@ -68,7 +69,7 @@ int main() {
 	float particleRadius = 10.0f;
 	int numSides = 100;
 	float dampingFactor = 0.85;
-	int numParticles = 900;
+	int numParticles = 400;
 	ParticleSystem particleSystem(SCREEN_WIDTH, SCREEN_HEIGHT, ourShader, VAO, VBO, particleRadius, numSides, dampingFactor, numParticles, "grid");
 	std::vector<Particle> particles = particleSystem.createParticles(); // create array of particle objects
 
@@ -82,6 +83,7 @@ int main() {
 		float currentFrame = static_cast<float>(glfwGetTime());
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
+		calculateFPS(deltaTime);
 		if (deltaTime > 0.05f) { deltaTime = 0.05f; }
 
 		processInput(window);
@@ -113,4 +115,11 @@ void processInput(GLFWwindow* window)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) 
 		glfwSetWindowShouldClose(window, true);
+}
+
+// Calculate framerate
+void calculateFPS(float deltaTime)
+{
+	float fps = 1 / deltaTime;
+	std::cout << "FPS: " << fps << std::endl;
 }
